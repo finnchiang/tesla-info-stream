@@ -1,0 +1,33 @@
+name: Tesla Info Auto Update
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # 每15分钟自动运行一次
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install requests openai beautifulsoup4
+
+    - name: Run auto update script
+      run: python auto_worker.py
+
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "bot@example.com"
+        git config --global user.name "TeslaBot"
+        git add .
+        git commit -m "auto: update info stream" || echo "No changes"
+        git push
